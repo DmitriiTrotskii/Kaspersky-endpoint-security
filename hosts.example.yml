@@ -1,0 +1,22 @@
+all:
+  vars:
+    KES_PRESENT: true
+    KES_VERSION: '11.4.0-1131'
+    KA_VERSION: '14.0.0-4646'
+  children:
+    group_01:
+      vars:
+        KLNAGENT_TAG: some_tag_for_group_01
+      hosts:
+        group_01_host_01:
+        group_01_host_02:
+    group_02:
+      vars:
+        KLNAGENT_TAG: some_tag_for_group_02
+      hosts:
+        group_02_host_01:
+          vars:
+            KES_PRESENT: false
+        group_02_host_02:
+          vars:
+            KES_VERSION: '11.3.0-7541'
