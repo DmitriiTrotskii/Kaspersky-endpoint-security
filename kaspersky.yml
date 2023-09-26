@@ -1,0 +1,80 @@
+---
+- name: Kaspresky Endpoint Security for Linux station
+  hosts: "{{ TARGET }}"
+  gather_facts: true
+
+  roles:
+    - kaspersky
+
+  pre_tasks:
+
+    - name: Get service facts
+      ansible.builtin.service_facts:
+
+    - name: Get package facts
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Get Kaspersky current version
+      ansible.builtin.set_fact:
+        KES_CURRENT_VERSION: "{{ ansible_facts.packages['kesl'][0]['version'] }}-{{ ansible_facts.packages['kesl'][0]['release'] }}"
+      when:
+        - "'kesl' in ansible_facts.packages"
+
+    - name: Get Kaspersky current version
+      ansible.builtin.set_fact:
+        KA_CURRENT_VERSION: "{{ ansible_facts.packages['klnagent64'][0]['version'] }}-{{ ansible_facts.packages['klnagent64'][0]['release'] }}"
+      when:
+        - "'klnagent64' in ansible_facts.packages"
+
+    - name: Disable SELinux
+      ansible.posix.selinux:
+        state: disabled
+      register: selinux_info
+
+    - name: Disable SELinux
+      ansible.builtin.shell: setenforce 0
+      when: selinux_info.reboot_required
+
+    - name: Install requirements
+      ansible.builtin.dnf:
+        name: '{{ item }}'
+        state: present
+      loop:
+        - perl
+
+  post_tasks:
+
+    - block:
+      - name: Start Kaspersky Security
+        ansible.builtin.service:
+          name: kesl
+          state: started
+      - name: Start Kaspersky Agent
+        ansible.builtin.service:
+          name: klnagent64
+          state: started
+      when:
+        - KES_PRESENT | bool
+
+    - name: Get service facts
+      ansible.builtin.service_facts:
+
+    - name: Get package facts
+      ansible.builtin.package_facts:
+        manager: auto
+    
+    - block:
+      - name: Get current info
+        ansible.builtin.set_fact:
+          KES_CURRENT_VERSION: "{{ ansible_facts.packages['kesl'][0]['version'] }}-{{ ansible_facts.packages['kesl'][0]['release'] }}"
+          KA_CURRENT_VERSION: "{{ ansible_facts.packages['klnagent64'][0]['version'] }}-{{ ansible_facts.packages['klnagent64'][0]['release'] }}"
+          KES_CURRENT_STATE: "{{ ansible_facts.services['kesl.service']['state'] }}"
+          KA_CURRENT_STAT: "{{ ansible_facts.services['klnagent64.service']['state'] }}"
+      - name: Write Kaspetsky state
+        ansible.builtin.debug:
+          msg:
+           - 'Kaspersky Endpoint Security: {{ KES_CURRENT_VERSION }} {{ KES_CURRENT_STATE }}'
+           - 'Kaspersky Network Angetn {{ KA_CURRENT_VERSION }} {{ KA_CURRENT_STAT }}'
+      when:
+        - KES_PRESENT | bool

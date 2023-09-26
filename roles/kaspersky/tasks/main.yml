@@ -1,0 +1,31 @@
+---
+- name: Run tasks for remove Kaspersky Security
+  ansible.builtin.include_tasks:
+    file: kes_remove.yml
+  when:
+    - not KES_PRESENT | bool or KES_CURRENT_VERSION != KES_VERSION
+
+- name: Run tasks for remove Kaspersky Agent
+  ansible.builtin.include_tasks:
+    file: klnagent_remove.yml
+  when:
+    - not KES_PRESENT | bool or KA_CURRENT_VERSION != KA_VERSION
+
+- name: Remove all Kaspersky directory
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: absent
+  loop:
+    - /var/opt/kaspersky
+    - /opt/kaspersky
+  when:
+    - not KES_PRESENT | bool
+
+- name: Run tasks for install Kaspersky Agent
+  ansible.builtin.include_tasks:
+    file: '{{ item }}'
+  loop:
+    - klnagent_install.yml
+    - kes_install.yml
+  when:
+    - KES_PRESENT | bool

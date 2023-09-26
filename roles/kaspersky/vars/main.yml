@@ -1,0 +1,23 @@
+---
+KES_CURRENT_VERSION:
+KA_CURRENT_VERSION:
+
+### Kaspesky source vars  #####################################################
+KES_RPM: 'http://___/kesl-{{ KES_VERSION }}.x86_64.rpm'
+KA_RPM: 'http://___/klnagent64-{{ KA_VERSION }}.x86_64.rpm'
+
+### Kaspersky configs  #######################################################
+KES_CFG_TEMPLATE: 'kes.j2'
+KA_CFG_TEMPLATE: 'klnagent.j2'
+
+### Kaspesky Security vars ###################################################
+KES_INSTALL_LOG: '/tmp/kes.log'
+KES_CONFIG: '/opt/kaspersky/kesl/bin/kes.cfg'
+KES_CRON_MIN: 5
+KSE_CRON_HOUR: 0
+
+### Kaspersky agnet vars #####################################################
+KA_INSTALL_LOG: '/tmp/kagent.log'
+KA_CONFIG: '/opt/kaspersky/klnagent64/lib/bin/setup/klnagent.cfg'
+KA_CRON_MIN: 10
+KA_CRON_HOUR: 0

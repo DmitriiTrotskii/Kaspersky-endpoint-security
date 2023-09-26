@@ -1,0 +1,11 @@
+---
+#
+# Дополниетльная информация, по параметрам, в српавке:
+# https://support.kaspersky.com/KSC/14/ru-RU/199693.htm
+
+KLNAGENT_SERVER: ''
+KLNAGENT_SSLPORT: '13000'
+KLNAGENT_PORT: '14000'
+KLNAGENT_USESSL: '1'
+KLNAGENT_VM_OPTIMIZE: '1'
+KLNAGENT_TAGS: '{{ KLNAGENT_TAG }}'

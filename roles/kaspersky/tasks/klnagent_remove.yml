@@ -1,0 +1,21 @@
+---
+- name: Stop Kaspersky Agent service
+  ansible.builtin.service:
+    name: klnagent
+    state: stopped
+  when:
+    - "'klnagent64.service' in ansible_facts.services"
+
+- name: Uninstall Kaspersky Agent package
+  ansible.builtin.dnf:
+    name: klnagent64
+    state: absent
+    disable_gpg_check: true
+
+- name: Remove Kaspersky Agent directory
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: absent
+  loop:
+    - /opt/kaspersky/klnagent64
+    - /var/opt/kaspersky/klnagent

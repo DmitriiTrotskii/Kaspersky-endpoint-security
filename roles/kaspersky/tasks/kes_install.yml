@@ -1,0 +1,34 @@
+---
+- name: Read Kaspersky Security config vars
+  ansible.builtin.include_vars:
+    dir: vars
+    files_matching: kes.cfg.yml
+
+- name: Install Kaspersky Security
+  ansible.builtin.dnf:
+    name: '{{ KES_RPM }}'
+    state: present
+    disable_gpg_check: true
+  notify:
+    - Stop Kaspersky Security
+
+- name: Copy Kaspersky Security config
+  ansible.builtin.template:
+    src: '{{ KES_CFG_TEMPLATE }}'
+    dest: '{{ KES_CONFIG }}'
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Config Kaspersky Security
+    - Stop Kaspersky Security
+
+- name: Add cron job for Kaspersky security
+  ansible.builtin.cron:
+    name: "Restart Kaspersky Security"
+    minute: '{{ KES_CRON_MIN }}'
+    hour: '{{ KSE_CRON_HOUR }}'
+    job: "systemctl restart kesl.service"
+
+- name: Force handlers
+  ansible.builtin.meta: flush_handlers

@@ -1,0 +1,33 @@
+---
+- name: Config Kaspersky Security
+  ansible.builtin.shell: '/opt/kaspersky/kesl/bin/kesl-setup.pl --autoinstall={{ KES_CONFIG }} >> {{ KES_INSTALL_LOG }}'
+
+- name: Config Kaspersky Agent
+  ansible.builtin.shell: '/opt/kaspersky/klnagent64/lib/bin/setup/postinstall.pl >> {{ KA_INSTALL_LOG }}'
+  environment:
+    KLAUTOANSWERS: '{{ KA_CONFIG }}'
+
+- name: Start Kaspersky Security
+  ansible.builtin.service:
+    name: kesl
+    state: started
+
+- name: Start Kaspersky Agent
+  ansible.builtin.service:
+    name: klnagent64
+    state: started
+
+- name: Stop Kaspersky Security
+  ansible.builtin.service:
+    name: kesl
+    state: stopped
+
+- name: Stop Kaspersky Agent
+  ansible.builtin.service:
+    name: klnagent64
+    state: stopped
+
+- name: reload firewalld
+  ansible.builtin.shell: firewall-cmd --reload
+  args:
+    executable: /bin/bash

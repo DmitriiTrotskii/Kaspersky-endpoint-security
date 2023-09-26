@@ -1,0 +1,13 @@
+---
+#
+# Дополниетльная информация, по параметрам, в српавке:
+# https://support.kaspersky.com/help/KES4Linux/11.3.0/ru-RU/236947.htm
+
+KES_USE_KSN: 'no'
+KES_LOCALE: 'en_US.UTF-8'
+KES_UPDATER_SOURCE: 'SCServer'
+KES_UPDATE_EXECUTE: 'no'
+KES_KERNEL_SRCS_INSTALL: 'no'
+KES_USE_GUI: 'no'
+KES_CONFIGURE_SELINUX: 'no'
+KES_ScanMemoryLimit: '2048'

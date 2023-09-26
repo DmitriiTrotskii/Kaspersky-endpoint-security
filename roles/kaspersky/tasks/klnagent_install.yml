@@ -1,0 +1,48 @@
+---
+- name: Read Kaspersky Agent config vars
+  ansible.builtin.include_vars:
+    dir: vars
+    files_matching: klnagent.cfg.yml
+
+- name: Install Kaspersky Agent
+  ansible.builtin.dnf:
+    name: '{{ KA_RPM }}'
+    state: present
+    disable_gpg_check: true
+  notify:
+    - Stop Kaspersky Agent
+
+- name: Copy Kaspersky Agent config
+  ansible.builtin.template:
+    src: '{{ KA_CFG_TEMPLATE }}'
+    dest: '{{ KA_CONFIG }}'
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Config Kaspersky Agent
+    - Stop Kaspersky Agent
+
+- name: Add cron job for Kaspersky security
+  ansible.builtin.cron:
+    name: "Restart Kaspersky Network Agent"
+    minute: '{{ KA_CRON_MIN }}'
+    hour: '{{ KA_CRON_HOUR }}'
+    job: "systemctl restart klnagent.service"
+
+- name: config firewalld for klnagnet if enabled
+  ansible.posix.firewalld:
+    port: '{{ item }}'
+    permanent: true
+    state: enabled
+  loop:
+    - 15000/udp
+  when:
+    - "'firewalld.service' in ansible_facts.services"
+    - "ansible_facts.services['firewalld.service']['status'] == 'enabled'"
+    - "ansible_facts.services['firewalld.service']['state'] == 'running'"
+  notify:
+    - reload firewalld
+
+- name: Force handlers
+  ansible.builtin.meta: flush_handlers

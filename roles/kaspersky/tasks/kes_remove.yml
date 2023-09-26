@@ -1,0 +1,26 @@
+---
+- name: Stop Kaspersky Security service
+  ansible.builtin.service:
+    name: kesl
+    state: stopped
+  when: 
+    - "'kesl.service' in ansible_facts.services"
+
+- name: Uninstall Kaspersky Security package
+  ansible.builtin.dnf:
+    name: kesl
+    state: absent
+    disable_gpg_check: true
+
+- name: Remove cron job for Kaspersky security
+  ansible.builtin.cron:
+    name: "Restart Kaspersky Security"
+    state: absent
+
+- name: Remove Kaspersky Security directory
+  ansible.builtin.file:
+    path: '{{ item }}'
+    state: absent
+  loop:
+    - /opt/kaspersky/kesl
+    - /var/opt/kaspersky/kesl
